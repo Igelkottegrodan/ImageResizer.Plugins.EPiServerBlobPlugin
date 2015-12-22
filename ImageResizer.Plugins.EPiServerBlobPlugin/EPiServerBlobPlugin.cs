@@ -11,7 +11,7 @@ using System.Web;
 
 namespace ImageResizer.Plugins.EPiServerBlob
 {
-    public class EPiServerImageBlobPlugin : IVirtualImageProvider, IPlugin
+    public class EPiServerBlobPlugin : IVirtualImageProvider, IPlugin
     {
         private readonly UrlResolver __urlResolver = ServiceLocator.Current.GetInstance<UrlResolver>();
 
@@ -53,7 +53,7 @@ namespace ImageResizer.Plugins.EPiServerBlob
         private void OnPostAuthorizeRequestStart(IHttpModule sender, HttpContext context)
         {
             string absolutePath = context.Request.Url.AbsolutePath;
-            IContent resolvedContent = __urlResolver.Route(new UrlBuilder(absolutePath), context.GetRequestContext().GetContextMode());
+            IContent resolvedContent = __urlResolver.Route(new UrlBuilder(absolutePath));
 
             if (resolvedContent == null)
             {                
