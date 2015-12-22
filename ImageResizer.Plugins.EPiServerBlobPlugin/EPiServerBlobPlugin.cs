@@ -52,7 +52,7 @@ namespace ImageResizer.Plugins.EPiServerBlob
 
         private void OnPostAuthorizeRequestStart(IHttpModule sender, HttpContext context)
         {
-            string absolutePath = context.Request.Url.AbsolutePath;
+            string absolutePath = this.CleanEditModePath(context.Request.Url.AbsolutePath);
             IContent resolvedContent = __urlResolver.Route(new UrlBuilder(absolutePath));
 
             if (resolvedContent == null)
@@ -77,7 +77,7 @@ namespace ImageResizer.Plugins.EPiServerBlob
             // Disable cache if editing or previewing
             if (previewOrEditMode)
             {
-                Config.Current.Pipeline.PreRewritePath = this.CleanEditModePath(absolutePath);
+                Config.Current.Pipeline.PreRewritePath = absolutePath;
                 NameValueCollection modifiedQueryString = new NameValueCollection(Config.Current.Pipeline.ModifiedQueryString);
 
                 modifiedQueryString.Add("process", ProcessWhen.Always.ToString());
