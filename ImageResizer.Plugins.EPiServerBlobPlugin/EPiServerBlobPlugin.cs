@@ -8,6 +8,7 @@ using ImageResizer.Configuration;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Web;
+using System;
 
 namespace ImageResizer.Plugins.EPiServerBlob
 {
@@ -52,8 +53,10 @@ namespace ImageResizer.Plugins.EPiServerBlob
 
         private void OnPostAuthorizeRequestStart(IHttpModule sender, HttpContext context)
         {
-            if (context.Request.Url.ToString().Contains("Thumbnail?epieditmode"))
+            if (!this.CanHandleRequest(context))
+            {
                 return;
+            }
                 
             string absolutePath = this.CleanEditModePath(context.Request.Url.AbsolutePath);
             IContent resolvedContent = __urlResolver.Route(new UrlBuilder(absolutePath));
@@ -92,6 +95,26 @@ namespace ImageResizer.Plugins.EPiServerBlob
         private string CleanEditModePath(string path)
         {
             return Regex.Replace(path, @",.*$", string.Empty);
+        }
+
+        private bool CanHandleRequest(HttpContext context)
+        {
+            if(this.IsThumbnailRequest(context) || this.IsDownloadRequest(context))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsDownloadRequest(HttpContext context)
+        {
+            return context.Request.Url.ToString().ToLowerInvariant().Contains("download?epieditmode");
+        }
+
+        private bool IsThumbnailRequest(HttpContext context)
+        {
+            return context.Request.Url.ToString().ToLowerInvariant().Contains("thumbnail?epieditmode");
         }
     }
 }
